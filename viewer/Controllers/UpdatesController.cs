@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using System.Net;
 using System.Text;
-using System.Net.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.SignalR;
@@ -15,9 +13,12 @@ using viewer.Models;
 
 namespace viewer.Controllers
 {
+
     [Route("api/[controller]")]
     public class UpdatesController : Controller
     {
+        private static string GRID_UPDATE = "gridupdate";
+
         #region Data Members
 
         private bool EventTypeSubcriptionValidation
@@ -84,7 +85,7 @@ namespace viewer.Controllers
                     .First();
 
             await this._hubContext.Clients.All.SendAsync(
-                "gridupdate",
+                GRID_UPDATE,
                 gridEvent.Id,
                 gridEvent.EventType,
                 gridEvent.Subject,
@@ -108,7 +109,7 @@ namespace viewer.Controllers
                 // an event grid notiification.                        
                 var details = JsonConvert.DeserializeObject<GridEvent<dynamic>>(e.ToString());
                 await this._hubContext.Clients.All.SendAsync(
-                    "gridupdate",
+                    GRID_UPDATE,
                     details.Id,
                     details.EventType,
                     details.Subject,
@@ -126,7 +127,7 @@ namespace viewer.Controllers
             // CloudEvents schema and mapping to 
             // Event Grid: https://docs.microsoft.com/en-us/azure/event-grid/cloudevents-schema 
             await this._hubContext.Clients.All.SendAsync(
-                "gridupdate",
+                GRID_UPDATE,
                 details.EventId,
                 details.EventType,
                 details.Source,
